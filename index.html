@@ -234,10 +234,11 @@
               <option value="acm-1_22-amadeirado">ACM 1.22mm amadeirado</option>
               <option value="metalon-20x30">Metalon galvanizado 20x30</option>
               <option value="metalon-30x30">Metalon 30x30 (tesoura)</option>
-              <option value="lona">Lona</option>
               <option value="adesivo">Adesivo</option>
               <option value="modulo-led">Módulo LED</option>
               <option value="pintura-automotiva">Pintura Automotiva</option>
+              <option value="lona-com-estrutura">Lona com estrutura</option>
+
             </select>
             <label for="half-sheet" id="half-sheet-label" style="display: none;">
               <input type="checkbox" id="half-sheet" /> 1/2 chapa
@@ -248,6 +249,16 @@
         <div class="field" id="field-quantidade">
           <label for="quantidade">Quantidade de chapas / unidades</label>
           <input id="quantidade" type="number" min="0" step="1" placeholder="Digite a quantidade" />
+        </div>
+
+        <div class="field" id="field-largura" style="display: none;">
+          <label for="largura">Largura (mm)</label>
+          <input id="largura" type="number" min="0" step="1" placeholder="Digite a largura em milímetros" />
+        </div>
+
+        <div class="field" id="field-altura" style="display: none;">
+          <label for="altura">Altura (mm)</label>
+          <input id="altura" type="number" min="0" step="1" placeholder="Digite a altura em milímetros" />
         </div>
 
         <div class="field">
@@ -322,6 +333,11 @@
     const resValor = document.getElementById('res-valor');
     const resQuantidadeLabel = document.getElementById('res-quantidade-label');
     const resTotal = document.getElementById('res-total');
+
+    const largura = document.getElementById('largura');
+    const altura = document.getElementById('altura');
+    const fieldLargura = document.getElementById('field-largura');
+    const fieldAltura = document.getElementById('field-altura');
 
     let itens = [];
 
@@ -436,20 +452,13 @@
         dimensions: '30x30mm',
       },
 
-      'lona': {
-        name: 'Lona',
-        price: 100,
-        calc: 'unit',
-        dimensions: 'por metro',
-      },
-      
       'adesivo': {
         name: 'Adesivo',
         price: 40,
         calc: 'unit',
         dimensions: 'por metro',
       },
-      
+
       'modulo-led': {
         name: 'Módulo LED',
         price: 0,
@@ -462,6 +471,13 @@
         calc: 'manual',
         dimensions: 'unidade',
       },
+      'lona-com-estrutura': {
+        name: 'Lona com estrutura',
+        price: 180,
+        calc: 'area',
+        dimensions: 'por m²',
+      },
+      
     };
 
     function formatCurrency(value) {
@@ -490,12 +506,23 @@
         quantidade.min = '0';
         quantidade.step = '0.01';
         resQuantidadeLabel.style.display = 'none';
+        fieldQuantidade.style.display = 'block';
+        fieldLargura.style.display = 'none';
+        fieldAltura.style.display = 'none';
+      } else if (data.calc === 'area') {
+        fieldQuantidade.style.display = 'none';
+        fieldLargura.style.display = 'block';
+        fieldAltura.style.display = 'block';
+        resQuantidadeLabel.style.display = 'block';
       } else {
         fieldQuantidade.querySelector('label').textContent = 'Quantidade de chapas / unidades';
         quantidade.placeholder = 'Digite a quantidade';
         quantidade.min = '0';
         quantidade.step = '1';
         resQuantidadeLabel.style.display = 'block';
+        fieldQuantidade.style.display = 'block';
+        fieldLargura.style.display = 'none';
+        fieldAltura.style.display = 'none';
       }
 
       atualizarOrcamento();
@@ -514,15 +541,29 @@
         unitPrice = quantityInput;
         quantityNeeded = 1;
         total = unitPrice;
+        resMaterial.textContent = data.name;
+        resValor.textContent = formatCurrency(unitPrice);
+        resQuantidadeLabel.style.display = 'none';
+        resTotal.textContent = formatCurrency(total);
+      } else if (data.calc === 'area') {
+        const w_mm = parseFloat(largura.value) || 0;
+        const h_mm = parseFloat(altura.value) || 0;
+        const w_m = w_mm / 1000;
+        const h_m = h_mm / 1000;
+        const area = w_m * h_m;
+        total = area * data.price;
+        resMaterial.textContent = data.name;
+        resValor.textContent = formatCurrency(data.price) + ' por m²';
+        resQuantidadeLabel.innerHTML = `Área: <strong>${formatNumber(area)} m²</strong>`;
+        resTotal.textContent = formatCurrency(total);
       } else {
         unitPrice = data.price * (halfSheet.checked ? 0.5 : 1);
         total = quantityNeeded * unitPrice;
+        resMaterial.textContent = data.name + (halfSheet.checked ? ' (1/2 chapa)' : '');
+        resValor.textContent = formatCurrency(unitPrice);
+        resQuantidadeLabel.innerHTML = `Quantidade: <strong>${quantityNeeded.toLocaleString('pt-BR')}</strong>`;
+        resTotal.textContent = formatCurrency(total);
       }
-
-      resMaterial.textContent = data.name + (halfSheet.checked ? ' (1/2 chapa)' : '');
-      resValor.textContent = formatCurrency(unitPrice);
-      resQuantidade.textContent = quantityNeeded.toLocaleString('pt-BR');
-      resTotal.textContent = formatCurrency(total);
     }
 
     function salvarItens() {
@@ -584,7 +625,7 @@
           <div class="item-card">
             <p><strong>${item.name}</strong></p>
             <p>Dimensões: ${item.dimensions}</p>
-            <p>Quantidade: ${item.isManual ? '1 unidade' : item.quantity.toLocaleString('pt-BR')}</p>
+            <p>Quantidade: ${item.isManual ? '1 unidade' : item.quantity.toLocaleString('pt-BR') + (item.quantityUnit ? ' ' + item.quantityUnit : '')}</p>
             <p>Valor unitário: ${formatCurrency(item.unitPrice)}</p>
             <p>Total: ${formatCurrency(item.total)}</p>
             <button type="button" data-index="${index}">Remover</button>
@@ -624,6 +665,13 @@
           alert('Informe um valor válido antes de adicionar.');
           return;
         }
+      } else if (data.calc === 'area') {
+        const w_mm = parseFloat(largura.value) || 0;
+        const h_mm = parseFloat(altura.value) || 0;
+        if (!w_mm || !h_mm || w_mm <= 0 || h_mm <= 0) {
+          alert('Informe largura e altura válidas antes de adicionar.');
+          return;
+        }
       } else {
         if (!quantityInput || quantityInput <= 0) {
           alert('Informe uma quantidade válida antes de adicionar.');
@@ -633,21 +681,39 @@
 
       let unitPrice = data.price;
       let quantityNeeded = quantityInput;
+      let total = 0;
+      let itemName = data.name;
+      let itemQuantity = quantityNeeded;
+      let itemDimensions = data.dimensions;
 
       if (data.calc === 'manual') {
         unitPrice = quantityInput;
         quantityNeeded = 1;
+        total = unitPrice;
+        itemQuantity = 1;
+      } else if (data.calc === 'area') {
+        const w_mm = parseFloat(largura.value) || 0;
+        const h_mm = parseFloat(altura.value) || 0;
+        const w_m = w_mm / 1000;
+        const h_m = h_mm / 1000;
+        const area = w_m * h_m;
+        total = area * data.price;
+        itemQuantity = area;
+        itemDimensions = `${w_mm.toLocaleString('pt-BR')}mm x ${h_mm.toLocaleString('pt-BR')}mm (${formatNumber(area)}m²)`;
       } else {
         unitPrice = data.price * (halfSheet.checked ? 0.5 : 1);
+        total = quantityNeeded * unitPrice;
+        itemName += halfSheet.checked ? ' (1/2 chapa)' : '';
       }
 
       const item = {
-        name: data.name + (halfSheet.checked ? ' (1/2 chapa)' : ''),
-        quantity: quantityNeeded,
+        name: itemName,
+        quantity: itemQuantity,
         unitPrice,
-        total: quantityNeeded * unitPrice,
-        dimensions: data.dimensions,
+        total,
+        dimensions: itemDimensions,
         isManual: data.calc === 'manual',
+        quantityUnit: data.calc === 'area' ? 'm²' : '',
       };
 
       itens.push(item);
@@ -655,6 +721,8 @@
       salvarMargem();
       renderizarItens();
       quantidade.value = '';
+      largura.value = '';
+      altura.value = '';
       atualizarOrcamento();
     }
 
@@ -667,6 +735,8 @@
 
     material.addEventListener('change', atualizarMaterial);
     quantidade.addEventListener('input', atualizarOrcamento);
+    largura.addEventListener('input', atualizarOrcamento);
+    altura.addEventListener('input', atualizarOrcamento);
     adicionar.addEventListener('click', adicionarItem);
     halfSheet.addEventListener('change', atualizarOrcamento);
     modoPercent.addEventListener('change', atualizarModoMargem);
