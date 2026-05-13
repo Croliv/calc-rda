@@ -202,18 +202,54 @@
       font-size: 16px;
     }
   </style>
+  <style media="print">
+    body {
+      background: white !important;
+      color: black !important;
+      font-size: 12px;
+    }
+    header {
+      background: white !important;
+      color: black !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+    .card {
+      page-break-inside: avoid;
+      box-shadow: none !important;
+      border: 1px solid #ccc;
+    }
+    .item-card {
+      page-break-inside: avoid;
+    }
+    main {
+      display: block;
+      height: auto;
+    }
+    .input-section, .preview-section {
+      width: 100%;
+      max-height: none;
+    }
+    button {
+      display: none;
+    }
+    input, select {
+      border: none;
+      background: transparent;
+    }
+  </style>
 </head>
 <body>
   <header>
     <div style="display: flex; align-items: flex-start; gap: 16px;">
-      <img src="logo-rda.png" alt="RDA" style="height: 70px; margin-top: -5px;">
+      <img src="logo-rda.png" alt="RDA" style="height: 70px; margin-top: -5px; cursor: pointer;" onclick="limparItens()">
       <div style="flex: 1; text-align: center;">
         <h1 style="margin: 0;">CALC MAT RDA</h1>
         <p style="margin: 4px 0 0 0; font-size: 12px;">Selecione o material e informe a quantidade de chapas ou unidades para obter o orçamento.</p>
       </div>
-      <div style="width: 70px;"></div>
+      <button onclick="window.print()" style="background: none; border: none; color: white; font-size: 14px; cursor: pointer; padding: 5px;">📄</button>
     </div>
-  </header>
+  </header> 
 
   <main>
     <div class="input-section">
@@ -731,6 +767,15 @@
       salvarItens();
       salvarMargem();
       renderizarItens();
+    }
+
+    function limparItens() {
+      if (confirm('Tem certeza que deseja limpar todos os itens?')) {
+        itens = [];
+        salvarItens();
+        salvarMargem();
+        renderizarItens();
+      }
     }
 
     material.addEventListener('change', atualizarMaterial);
