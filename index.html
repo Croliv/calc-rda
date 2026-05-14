@@ -258,10 +258,10 @@
           <label for="material">Material</label>
           <div style="display: flex; align-items: center; gap: 10px;">
             <select id="material">
-              <option value="pvc-expandido-20mm">PVC Expandido 20mm</option>
-              <option value="pvc-expandido-15mm">PVC Expandido 15mm</option>
-              <option value="pvc-expandido-10mm">PVC Expandido 10mm</option>
               <option value="pvc-expandido-5mm">PVC Expandido 05mm</option>
+              <option value="pvc-expandido-10mm">PVC Expandido 10mm</option>
+              <option value="pvc-expandido-15mm">PVC Expandido 15mm</option>
+              <option value="pvc-expandido-20mm">PVC Expandido 20mm</option>              
               <option value="acrilico-normal-2mm">Acrílico normal 02mm</option>
               <option value="acrilico-espelhado-2mm">Acrílico espelhado 02mm</option>
               <option value="policarbonato-2mm">Policarbonato meia chapa 02mm</option>
@@ -271,10 +271,10 @@
               <option value="metalon-20x30">Metalon galvanizado 20x30</option>
               <option value="metalon-30x30">Metalon 30x30 (tesoura)</option>
               <option value="adesivo">Adesivo</option>
+              <option value="fita-pu">Fita e PU</option>
               <option value="modulo-led">Módulo LED</option>
-              <option value="pintura-automotiva">Pintura Automotiva</option>
+              <option value="pintura-automotiva">Pintura Automotiva</option>              
               <option value="lona-com-estrutura">Lona com estrutura</option>
-
             </select>
             <label for="half-sheet" id="half-sheet-label" style="display: none;">
               <input type="checkbox" id="half-sheet" /> 1/2 chapa
@@ -455,6 +455,7 @@
         sheetWidthMm: 5000,
         sheetHeightMm: 1500,
         calc: 'sheet',
+        halfSheetAvailable: true,
         dimensions: '5000mm x 1500mm',
       },
       'acm-1_22': {
@@ -464,6 +465,7 @@
         sheetWidthMm: 5000,
         sheetHeightMm: 1220,
         calc: 'sheet',
+        halfSheetAvailable: true,
         dimensions: '5000mm x 1220mm',
       },
       'acm-1_22-amadeirado': {
@@ -473,6 +475,7 @@
         sheetWidthMm: 5000,
         sheetHeightMm: 1220,
         calc: 'sheet',
+        halfSheetAvailable: true,
         dimensions: '5000mm x 1220mm',
       },
       'metalon-20x30': {
@@ -488,11 +491,25 @@
         dimensions: '30x30mm',
       },
 
+      'fita-pu': {
+        name: 'Fita e PU',
+        price: 0,
+        calc: 'manual',
+        dimensions: 'unidade',
+      },
+
       'adesivo': {
         name: 'Adesivo',
         price: 40,
         calc: 'unit',
         dimensions: 'por metro',
+      },
+
+      'lona-com-estrutura': {
+        name: 'Lona com estrutura',
+        price: 180,
+        calc: 'area',
+        dimensions: 'por m²',
       },
 
       'modulo-led': {
@@ -506,13 +523,8 @@
         price: 0,
         calc: 'manual',
         dimensions: 'unidade',
-      },
-      'lona-com-estrutura': {
-        name: 'Lona com estrutura',
-        price: 180,
-        calc: 'area',
-        dimensions: 'por m²',
-      },
+      },     
+      
       
     };
 
