@@ -800,6 +800,18 @@
     modoTotal.addEventListener('change', atualizarModoMargem);
     margem.addEventListener('input', () => { salvarMargem(); renderizarItens(); });
 
+    // Enable Enter key to add item when focused on relevant inputs (excluding margem)
+    const inputSectionInputs = document.querySelectorAll('.input-section input, .input-section select');
+    inputSectionInputs.forEach(el => {
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          if (e.target.id === 'margem') return;
+          e.preventDefault();
+          adicionarItem();
+        }
+      });
+    });
+
     carregarItens();
     carregarMargem();
     atualizarMaterial();
