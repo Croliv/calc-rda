@@ -273,9 +273,11 @@
               <option value="adesivo">Adesivo</option>
               <option value="fita-pu">Fita e PU</option>
               <option value="modulo-led">Módulo LED</option>
-              <option value="pintura-automotiva">Pintura Automotiva</option>              
+              <option value="pintura-automotiva">Pintura Automotiva</option>
+              <option value="telha-trapezoidal-m2">Telha trapezoidal por m²</option>
+              <option value="calha-por-metro">Calha por metro</option>
+              <option value="rufos-por-metro">Rufos por metro</option>
               <option value="lona-com-estrutura">Lona com estrutura</option>
-              <option value="combustivel">Combustível</option>
             </select>
             <label for="half-sheet" id="half-sheet-label" style="display: none;">
               <input type="checkbox" id="half-sheet" /> 1/2 chapa
@@ -284,7 +286,7 @@
         </div>
 
         <div class="field" id="field-quantidade">
-          <label for="quantidade">Quantidade de chapas / unidades</label>
+          <label for="quantidade">Quantidade de chapas / unidades / metros</label>
           <input id="quantidade" type="number" min="0" step="1" placeholder="Digite a quantidade" />
         </div>
 
@@ -461,7 +463,7 @@
       },
       'acm-1_22': {
         name: 'ACM 1.22mm',
-        price: 450,
+        price: 420,
         sheetArea: 6.1,
         sheetWidthMm: 5000,
         sheetHeightMm: 1220,
@@ -487,7 +489,7 @@
       },
       'metalon-30x30': {
         name: 'Metalon 30x30 (tesoura)',
-        price: 100,
+        price: 70,
         calc: 'unit',
         dimensions: '30x30mm',
       },
@@ -511,22 +513,35 @@
         price: 180,
         calc: 'area',
         dimensions: 'por m²',
+        quantityUnit: 'm²',
       },
-
+      'telha-trapezoidal-m2': {
+        name: 'Telha trapezoidal',
+        price: 100,
+        calc: 'area',
+        dimensions: 'por m²',
+        quantityUnit: 'm²',
+      },
+      'calha-por-metro': {
+        name: 'Calha',
+        price: 90,
+        calc: 'unit',
+        dimensions: 'por metro',
+        quantityUnit: 'm',
+      },
+      'rufos-por-metro': {
+        name: 'Rufos',
+        price: 50,
+        calc: 'unit',
+        dimensions: 'por metro',
+        quantityUnit: 'm',
+      },
       'modulo-led': {
         name: 'Módulo LED',
         price: 0,
         calc: 'manual',
         dimensions: 'unidade',
       },
-
-      'combustivel': {
-        name: 'Combustível',
-        price: 0,
-        calc: 'manual',
-        dimensions: 'unidade',
-      },
-      
       'pintura-automotiva': {
         name: 'Pintura Automotiva',
         price: 0,
@@ -618,7 +633,8 @@
         total = quantityNeeded * unitPrice;
         resMaterial.textContent = data.name + (halfSheet.checked ? ' (1/2 chapa)' : '');
         resValor.textContent = formatCurrency(unitPrice);
-        resQuantidadeLabel.innerHTML = `Quantidade: <strong>${quantityNeeded.toLocaleString('pt-BR')}</strong>`;
+        const unitLabel = data.quantityUnit ? ` ${data.quantityUnit}` : '';
+        resQuantidadeLabel.innerHTML = `Quantidade: <strong>${quantityNeeded.toLocaleString('pt-BR')}${unitLabel}</strong>`;
         resTotal.textContent = formatCurrency(total);
       }
     }
@@ -770,7 +786,7 @@
         total,
         dimensions: itemDimensions,
         isManual: data.calc === 'manual',
-        quantityUnit: data.calc === 'area' ? 'm²' : '',
+        quantityUnit: data.quantityUnit || (data.calc === 'area' ? 'm²' : ''),
       };
 
       itens.push(item);
